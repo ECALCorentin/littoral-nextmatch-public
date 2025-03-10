@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+  <body>
+    <script src="main.js" defer></script>
+    <form id="form">
+      <input type="text" id="tournament" placeholder="Enter tournament slug" required>
+      <input type="text" id="event" placeholder="Enter event slug" required>
+      <button type="submit">Submit</button>
+    </form>
+    <h1>Current User</h1>
+    <div>
+      <p id="userId">Id: waiting..</p>
+      <p id="playerId">Player id: waiting...</p>
+      <p id="playerName">Player name: waiting...</p>
+    </div>
+    <h1>Next matches</h1>
+    <div id="matchesRoot"></div>
+    <p id="lastQuery"></p>
+  </body>
+</html>
