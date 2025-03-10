@@ -1,20 +1,21 @@
-const TOURNAMENT_SLUG = "rival-rush-season-1"
-const EVENT_SLUG = "liga-split-1"
-let accessToken = new URL(window.location.href).searchParams.get("access_token")
+const TOURNAMENT_SLUG = "solid-littoral-09-the-return";
+const EVENT_SLUG = "utlimate single";
+let accessToken = new URL(window.location.href).searchParams.get(
+  "access_token"
+);
 if (accessToken) {
-  localStorage.setItem("access_token", accessToken)
+  localStorage.setItem("access_token", accessToken);
 } else {
-  accessToken = localStorage.getItem("access_token")
+  accessToken = localStorage.getItem("access_token");
   if (!accessToken) {
     window.location.href = "/login";
   }
 }
 
 // Remove the access token from the URL
-window.history.replaceState({}, document.title, "/index.html")
+window.history.replaceState({}, document.title, "/index.html");
 
-const rootDiv = document.getElementById("matchesRoot")
-
+const rootDiv = document.getElementById("matchesRoot");
 
 const tournamentInput = document.getElementById("tournament");
 const eventInput = document.getElementById("event");
@@ -24,38 +25,37 @@ eventInput.value = EVENT_SLUG;
 
 let currentUser = null;
 
-
 function submit(e) {
-  if (e)
-    e.preventDefault();
+  if (e) e.preventDefault();
 
   let tournamentSlug = tournamentInput.value;
   let eventSlug = eventInput.value;
 
   fetchEvent(tournamentSlug, eventSlug, currentUser.player.id).then((event) => {
-    console.log(event)
+    console.log(event);
     updateMatchesDisplay(event);
-  })
+  });
 }
 
 /**
-  * @param {string} query
-  * @param {object} variables
-  * @returns {Promise<{data: any}>}
-*/
+ * @param {string} query
+ * @param {object} variables
+ * @returns {Promise<{data: any}>}
+ */
 async function fetchGraphql(query, variables) {
-  return fetch('https://api.start.gg/gql/alpha', {
-    method: 'POST',
+  return fetch("https://api.start.gg/gql/alpha", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      "Authorization": `Bearer ${accessToken}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({ query, variables })
+    body: JSON.stringify({ query, variables }),
   }).then((res) => res.json());
 }
 
 async function getCurrentUser() {
-  return fetchGraphql(`query CurrentUser {
+  return fetchGraphql(
+    `query CurrentUser {
   currentUser {
     id
     name
@@ -65,11 +65,14 @@ async function getCurrentUser() {
       id
     }
   }
-}`, {}).then((res) => res.data);
+}`,
+    {}
+  ).then((res) => res.data);
 }
 
 async function fetchEvent(tournamentSlug, eventSlug, playerId) {
-  let query = await fetchGraphql(`query tournamentQuery($tournamentSlug: String, $eventSlug: String, $playerId: ID) {
+  let query = await fetchGraphql(
+    `query tournamentQuery($tournamentSlug: String, $eventSlug: String, $playerId: ID) {
   tournament(slug: $tournamentSlug) {
     id
     name
@@ -100,25 +103,28 @@ async function fetchEvent(tournamentSlug, eventSlug, playerId) {
       }
     }
   }
-}`, { eventSlug, tournamentSlug, playerId: playerId })
+}`,
+    { eventSlug, tournamentSlug, playerId: playerId }
+  );
   if (query.errors) {
-    console.error(query.errors)
+    console.error(query.errors);
     return;
   }
 
   let tournament = query.data.tournament;
   if (tournament.events.length == 0) {
-    console.error("No events")
+    console.error("No events");
     return;
   }
   let event = tournament.events[0];
-  document.getElementById("lastQuery").innerText = `Last query at ${new Date().toLocaleTimeString()}`;
-  console.log(event)
+  document.getElementById(
+    "lastQuery"
+  ).innerText = `Last query at ${new Date().toLocaleTimeString()}`;
+  console.log(event);
   return event;
 }
 
 function updateMatchesDisplay(event) {
-
   rootDiv.innerHTML = "";
 
   if (event.sets.nodes.length == 0) {
@@ -142,16 +148,20 @@ function updateMatchesDisplay(event) {
 
 async function main() {
   let user = await getCurrentUser();
-  console.log(user.currentUser)
+  console.log(user.currentUser);
 
   currentUser = user.currentUser;
 
   document.getElementById("userId").innerText = `Id: ${currentUser.id}`;
-  document.getElementById("playerId").innerText = `Player Id: ${currentUser.player.id}`;
-  document.getElementById("playerName").innerText = `Player Name: [${currentUser.player.prefix}] ${currentUser.player.gamerTag}`;
+  document.getElementById(
+    "playerId"
+  ).innerText = `Player Id: ${currentUser.player.id}`;
+  document.getElementById(
+    "playerName"
+  ).innerText = `Player Name: [${currentUser.player.prefix}] ${currentUser.player.gamerTag}`;
 
-  document.getElementById("form").addEventListener("submit", submit)
+  document.getElementById("form").addEventListener("submit", submit);
 
-  submit()
+  submit();
 }
-main()
+main();
